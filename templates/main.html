@@ -1,0 +1,91 @@
+{% load static %}
+<html>
+    <head>
+         <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="{% static 'css/circle.css' %}">
+        
+    </head>
+    <body>
+        <center>
+        <div class="container">
+                <div class="row">
+                    <h2> Кажете ја вашата фраза: </h2>
+                    <img onclick="recordAudio()" src="{% static 'mic.png' %}" width=200 height=200>
+                    <div id="load">   
+                        <div>А</div>                            
+                        <div>М</div>
+                        <div>И</div>
+                        <div>Н</div>
+                        <div>С</div>
+                    </div>
+                </div>
+        </div>
+        </center>
+    </body>
+    <script>
+        var recording = false;
+        // appends an audio element to playback and download recording
+        function createAudioElement(blobUrl) {
+            const downloadEl = document.createElement('a');
+            downloadEl.style = 'display: block';
+            downloadEl.innerHTML = 'download';
+            downloadEl.download = 'audio.webm';
+            downloadEl.href = blobUrl;
+            const audioEl = document.createElement('audio');
+            audioEl.controls = true;
+            const sourceEl = document.createElement('source');
+            sourceEl.src = blobUrl;
+            sourceEl.type = 'audio/webm';
+            audioEl.appendChild(sourceEl);
+            document.body.appendChild(audioEl);
+            document.body.appendChild(downloadEl);
+        }
+
+        function recordAudio() {
+            // request permission to access audio stream
+            navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                // store streaming data chunks in array
+                const chunks = [];
+                // create media recorder instance to initialize recording
+                const recorder = new MediaRecorder(stream);
+                // function to be called when data is received
+                recorder.ondataavailable = e => {
+                // add stream data to chunks
+                chunks.push(e.data);
+                // if recorder is 'inactive' then recording has finished
+                if (recorder.state == 'inactive') {
+                    // convert stream data chunks to a 'webm' audio format as a blob
+                    const blob = new Blob(chunks, { type: 'audio/webm' });
+                    console.log(blob)
+                    // convert blob to URL so it can be assigned to a audio src attribute
+                    createAudioElement(URL.createObjectURL(blob));
+                }
+                };
+                // start recording with 1 second time between receiving 'ondataavailable' events
+                recorder.start(1000);
+                if (recording == false)
+                {
+                    $('#load').show();
+                    recording = true;
+                }
+                else
+                {
+                    $('#load').hide();
+                    // recorder.stop();
+                    recording = false;
+                }
+                setTimeout(() => {
+        // this will trigger one final 'ondataavailable' event and set recorder state to 'inactive'
+        recorder.stop();
+    }, 3000);
+                // setTimeout to stop recording after 4 seconds
+            }).catch(console.error);
+        }
+
+    </script>
+</html>
