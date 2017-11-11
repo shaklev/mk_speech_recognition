@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test UI</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=PT+Sans:400,700&amp;subset=cyrillic,cyrillic-ext,latin-ext" rel="stylesheet">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/circle.css">
+</head>
+<body>
+    <center>
+        <div class="container">
+            <div class="row">
+                <h2> Кажете ја вашата фраза: </h2>
+                <div id="mic" onclick="recordAudio()">
+                    <i class="fa fa-microphone" aria-hidden="true"></i>
+                </div>
+                <button></button><div id="stop"></div>
+                <canvas id="canvas"></canvas>
+                <div id="load">   
+                    <div>А</div>                            
+                    <div>М</div>
+                    <div>И</div>
+                    <div>Н</div>
+                    <div>С</div>
+                </div>
+            </div>
+        </div>
+    </center>
+</body>
+</html>
