@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.shortcuts import render_to_response
@@ -17,20 +19,16 @@ class MainView(View):
     def post(self, request):
         # audio_blob = request.FILES['audio'].read(1024)
         audio_blob = request.FILES['audio']
-
         current_dir = os.path.dirname(os.path.realpath(__file__))
         # audio_blob = os.path.join(current_dir, "test.wav")
         # print(current_dir)
-
-  #       import numpy as np
+        #import numpy as np
 		# import scipy.io.wavfile
 		# import math
-
-		# file_name="another.wav"
+        # file_name="another.wav"
 		# rate=8000
 		# data2 = np.asarray(request.data, dtype=np.int16)
-
-		# scipy.io.wavfile.write(file_name,rate,data2)
+        # scipy.io.wavfile.write(file_name,rate,data2)
 
 
         # SpeechDetector object
