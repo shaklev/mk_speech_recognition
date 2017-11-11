@@ -18,19 +18,14 @@ class MainView(View):
         return render_to_response('main.html')
     
     def post(self, request):
-        # current_dir = os.path.dirname(os.path.realpath(__file__))
-        # audio_blob = os.path.join(current_dir, "test.wav")
-        # print(current_dir)
-        #import numpy as np
-		# import scipy.io.wavfile
-		# import math
-        # file_name="another.wav"
-		# rate=8000
-		# data2 = np.asarray(request.data, dtype=np.int16)
-        # scipy.io.wavfile.write(file_name,rate,data2)
         audio_blob = request.FILES['audio']
-        decoder = SpeechDetector();
-        decoder.run(audio_blob)
+        decoder = SpeechDetector()
+        sentence = decoder.run(audio_blob)
+        decoded_sentence = (' ').join(sentence)
+        
+        print 'The input sentence is:'
+        print decoded_sentence
+        # WIKIPEDIA SEARCH
         # wiki = WikiApi({'locale':'mk'})
         # decoded_sentence = 'decoded_sentence'
         # print 'Searching for results'

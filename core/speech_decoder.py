@@ -46,8 +46,8 @@ class SpeechDetector:
 
     def decode_phrase(self, wav_file):
         self.decoder.start_utt()
-        stream = open(wav_file, "rb")
-        # stream = wav_file
+        # stream = open(wav_file, "rb")
+        stream = wav_file
         while True:
           buf = stream.read(1024)
           if buf:
