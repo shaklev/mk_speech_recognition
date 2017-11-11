@@ -19,6 +19,8 @@ class MainView(View):
     def post(self, request):
         # audio_blob = request.FILES['audio'].read(1024)
         audio_blob = request.FILES['audio']
+        print(audio_blob.__dict__)
+        print(stop)
         current_dir = os.path.dirname(os.path.realpath(__file__))
         # audio_blob = os.path.join(current_dir, "test.wav")
         # print(current_dir)
