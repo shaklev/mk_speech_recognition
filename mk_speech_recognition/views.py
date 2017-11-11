@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.shortcuts import render_to_response
@@ -30,8 +31,16 @@ class MainView(View):
         audio_blob = request.FILES['audio']
         decoder = SpeechDetector();
         decoder.run(audio_blob)
-        wiki = WikiApi({'locale':'mk'})
-        results = wiki.find('Гоце Делчев')
-        response = wiki.get_article(results[0]).summary
+        # wiki = WikiApi({'locale':'mk'})
+        # decoded_sentence = 'decoded_sentence'
+        # print 'Searching for results'
+        # results = wiki.find(decoded_sentence)
+        # print 'Done searching'
+        # if results:
+        #     response = wiki.get_article(results[0]).summary
+        #     print 'The search returned the following article:'
+        #     print response
+        # else:
+        #     print 'No results were found for the sentence %s' %decoded_sentence
         data = {'status':200}
         return JsonResponse(data)
