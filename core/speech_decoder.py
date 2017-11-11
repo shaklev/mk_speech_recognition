@@ -29,16 +29,10 @@ class SpeechDetector:
 
         self.THRESHOLD = 4500
         self.num_phrases = -1
-
-        # These will need to be modified according to where the pocketsphinx folder is
-        # MODELDIR = "/usr/local/lib/python3.5/dist-packages/pocketsphinx/model"
-        # DATADIR = "/usr/local/lib/python3.5/dist-packages/pocketsphinxt/data"
+        
 
         # Create a decoder with certain model
         config = Decoder.default_config()
-        # config.set_string('-hmm', os.path.join(MODELDIR, 'en-us/en-us'))
-        # config.set_string('-lm', os.path.join(MODELDIR, 'en-us/en-us.lm.bin'))
-        # config.set_string('-dict', os.path.join(MODELDIR, 'en-us/cmudict-en-us.dict'))
 
         # get current directory
         current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -50,24 +44,9 @@ class SpeechDetector:
         # Creaders decoder object for streaming data.
         self.decoder = Decoder(config)
 
-
-    # def decode_phrase(self, wav_file):
-    #     self.decoder.start_utt()
-    #     stream = open(wav_file, "rb")
-    #     while True:
-    #       buf = stream.read(1024)
-    #       if buf:
-    #         self.decoder.process_raw(buf, False, False)
-    #       else:
-    #         break
-    #     self.decoder.end_utt()
-    #     words = []
-    #     [words.append(seg.word) for seg in self.decoder.seg()]
-    #     return words
-
     def decode_phrase(self, wav_file):
         self.decoder.start_utt()
-
+        # stream = open(wav_file, "rb")
         stream = wav_file
         while True:
           buf = stream.read(1024)
@@ -81,18 +60,11 @@ class SpeechDetector:
         return words
 
     def run(self, wav_file):
-        """
-        Listens to Microphone, extracts phrases from it and calls pocketsphinx
-        to decode the sound
-        """
-        # get current directory
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-
         r = self.decode_phrase(wav_file)
+        sentence = []
         for i in r:
-        	print "DETECTED: ", i.decode('utf-8')
-
-        print "* Done listening"
+            sentence.append(i)
+        return sentence
 
 if __name__ == "__main__":
     sd = SpeechDetector()

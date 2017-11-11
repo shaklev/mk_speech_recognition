@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.shortcuts import render_to_response
@@ -17,26 +18,24 @@ class MainView(View):
         return render_to_response('main.html')
     
     def post(self, request):
-        # audio_blob = request.FILES['audio'].read(1024)
         audio_blob = request.FILES['audio']
-        current_dir = os.path.dirname(os.path.realpath(__file__))
-        # audio_blob = os.path.join(current_dir, "test.wav")
-        # print(current_dir)
-        #import numpy as np
-		# import scipy.io.wavfile
-		# import math
-        # file_name="another.wav"
-		# rate=8000
-		# data2 = np.asarray(request.data, dtype=np.int16)
-        # scipy.io.wavfile.write(file_name,rate,data2)
-
-
-        # SpeechDetector object
-        decoder = SpeechDetector();
-
-        decoder.run(audio_blob)
-        wiki = WikiApi({'locale':'mk'})
-        results = wiki.find('Гоце Делчев')
-        response = wiki.get_article(results[0]).summary
+        decoder = SpeechDetector()
+        sentence = decoder.run(audio_blob)
+        decoded_sentence = (' ').join(sentence)
+        
+        print 'The input sentence is:'
+        print decoded_sentence
+        # WIKIPEDIA SEARCH
+        # wiki = WikiApi({'locale':'mk'})
+        # decoded_sentence = 'decoded_sentence'
+        # print 'Searching for results'
+        # results = wiki.find(decoded_sentence)
+        # print 'Done searching'
+        # if results:
+        #     response = wiki.get_article(results[0]).summary
+        #     print 'The search returned the following article:'
+        #     print response
+        # else:
+        #     print 'No results were found for the sentence %s' %decoded_sentence
         data = {'status':200}
         return JsonResponse(data)
