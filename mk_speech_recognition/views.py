@@ -17,11 +17,7 @@ class MainView(View):
         return render_to_response('main.html')
     
     def post(self, request):
-        # audio_blob = request.FILES['audio'].read(1024)
-        audio_blob = request.FILES['audio']
-        print(audio_blob.__dict__)
-        print(stop)
-        current_dir = os.path.dirname(os.path.realpath(__file__))
+        # current_dir = os.path.dirname(os.path.realpath(__file__))
         # audio_blob = os.path.join(current_dir, "test.wav")
         # print(current_dir)
         #import numpy as np
@@ -31,11 +27,8 @@ class MainView(View):
 		# rate=8000
 		# data2 = np.asarray(request.data, dtype=np.int16)
         # scipy.io.wavfile.write(file_name,rate,data2)
-
-
-        # SpeechDetector object
+        audio_blob = request.FILES['audio']
         decoder = SpeechDetector();
-
         decoder.run(audio_blob)
         wiki = WikiApi({'locale':'mk'})
         results = wiki.find('Гоце Делчев')

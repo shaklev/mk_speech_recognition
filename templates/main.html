@@ -31,88 +31,58 @@
         </div>
         </center>
     </body>
+
     <script>
 
-var recordRTC;
-
-function successCallback(audioStream) {
-var options = {
-    type: 'audio',
-    recorderType: StereoAudioRecorder,
-    sampleRate: 16000,
-    desiredSampRate: 16000,
- };
- var recordRTC = RecordRTC(audioStream, options);
-recordRTC.startRecording();
-}
-    
-
-    function errorCallback(error) {
-        console.log(error);
-    // maybe another application is using the device
-    }
+    var recordRTC;
 
     var mediaConstraints = { video: false, audio: true };
 
-        function recordAudio() {
-            // request permission to access audio stream
-            navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
-            
-    //             // store streaming data chunks in array
-    //             const chunks = [];
-    //             // create media recorder instance to initialize recording
-    //             const recorder = new MediaRecorder(stream);
-    //             // function to be called when data is received
-    //             recorder.ondataavailable = e => {
-    //             // add stream data to chunks
-    //             chunks.push(e.data);
-    //             // if recorder is 'inactive' then recording has finished
-    //             if (recorder.state == 'inactive') {
-    //                 // convert stream data chunks to a 'webm' audio format as a blob
-    //                 const blob = new Blob(chunks, { type: 'audio/wav' });
-    //                 console.log(blob)
-    //                 sendBlob(blob);
-    //                 // convert blob to URL so it can be assigned to a audio src attribute
-    //                 // createAudioElement(URL.createObjectURL(blob));
-    //             }
-    //             };
-    //             // start recording with 1 second time between receiving 'ondataavailable' events
-    //             recorder.start(1000);
-    //             $('#load').show();
-    //             setTimeout(() => {
-    //     // this will trigger one final 'ondataavailable' event and set recorder state to 'inactive'
-    //     recorder.stop();
-    //     $('#load').hide();
-    // }, 2000);
-    //             // setTimeout to stop recording after 4 seconds
-    //         }).catch(console.error);
-        }
+    // Initialize & start recording
+    function recordAudio() {
+        navigator.mediaDevices.getUserMedia(mediaConstraints).then(successCallback).catch(errorCallback);
+    }
 
-$('#stopRecording').click(function () {
-    recordRTC.stopRecording(function (audioVideoWebMURL) {
-        video.src = audioVideoWebMURL;
+    // Record audio
+    function successCallback(audioStream) {
+    var options = {
+        type: 'audio',
+        recorderType: StereoAudioRecorder,
+        sampleRate: 16000,
+        desiredSampRate: 16000,
+    };
+    recordRTC = RecordRTC(audioStream, options);
+    recordRTC.startRecording();
+    }
+    
+    // Catch error
+    function errorCallback(error) {
+        console.log(error);
+    }
 
-        var recordedBlob = recordRTC.getBlob();
-        console.log("STIA");
-        console.log(recordedBlob);
-        recordRTC.getDataURL(function(dataURL) { });
+    $('#stopRecording').click(function () {
+        recordRTC.stopRecording(function(audioURL) {    
+            var recordedBlob = recordRTC.getBlob();
+            console.log(recordedBlob);
+            sendBlob(recordedBlob);
+            recordRTC.getDataURL(function(dataURL) { });
+        });
     });
-});
-//*** RECORD AUDIO DEFAULT ***//
-    //     var recording = false;
-    //     function sendBlob(blob) {
-    //         var fd = new FormData();
-    //         fd.append('audio',blob);
-    //         $.ajax({
-    //             type: 'POST',
-    //             url: '/main/',
-    //             data: fd,
-    //             processData: false,
-    //             contentType: false
-    //         }).done(function(data) {
-    //             console.log(data);
-    //         });
-    //     }
+
+    // Send to server
+    function sendBlob(blob) {
+        var fd = new FormData();
+        fd.append('audio',blob);
+        $.ajax({
+            type: 'POST',
+            url: '/main/',
+            data: fd,
+            processData: false,
+            contentType: false
+        }).done(function(data) {
+            console.log(data);
+        });
+    }
 
     </script>
 </html>
