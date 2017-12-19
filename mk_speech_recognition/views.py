@@ -36,7 +36,6 @@ class MainView(View):
         url = 'http://www.makedonski.info/search/'
         data = dict(q=phrase,)
         r = session.post(url, data=data, allow_redirects=True)
-        print(phrase)
         try:
             mk_dict['word_type'] = Selector(text=r.content).xpath('//div[re:test(@class,"grammar")]//text()').extract()[1].encode('utf-8')
         except:
