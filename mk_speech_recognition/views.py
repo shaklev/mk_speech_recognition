@@ -36,9 +36,16 @@ class MainView(View):
         url = 'http://www.makedonski.info/search/'
         data = dict(q=phrase,)
         r = session.post(url, data=data, allow_redirects=True)
-        mk_dict['word_type'] = Selector(text=r.content).xpath('//div[re:test(@class,"grammar")]//text()').extract()[1].encode('utf-8')
-        word_definition = Selector(text=r.content).xpath('//div[re:test(@class,"meaning")]//text()').extract()
-        mk_dict['word_definition'] = word_definition
+        print(phrase)
+        try:
+            mk_dict['word_type'] = Selector(text=r.content).xpath('//div[re:test(@class,"grammar")]//text()').extract()[1].encode('utf-8')
+        except:
+            mk_dict['word_type'] = 'Нема резултати'
+        try:
+            word_definition = Selector(text=r.content).xpath('//div[re:test(@class,"meaning")]//text()').extract()
+            mk_dict['word_definition'] = word_definition
+        except:
+            mk_dict['word_definition'] = 'Нема резултати'
         return mk_dict
         
     def get(self, request):
@@ -53,8 +60,8 @@ class MainView(View):
         decoder = SpeechDetector()
         sentence = decoder.run(audio.audio_file.url)
         decoded_sentence = (' ').join(sentence)
-        # data['decoded_phrase'] = re.sub('<[^<]+?>', '', decoded_sentence).strip(' \n\t\r')
-        data['decoded_phrase'] = 'јазик'
+        data['decoded_phrase'] = re.sub('<[^<]+?>', '', decoded_sentence).strip(' \n\t\r')
+        #data['decoded_phrase'] = decoded_sentence
         # Wikipedia search
         wiki = WikiApi({'locale':'mk'})
         results = wiki.find(data['decoded_phrase'])
