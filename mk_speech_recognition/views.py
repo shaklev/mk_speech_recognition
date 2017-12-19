@@ -40,13 +40,22 @@ class MainView(View):
             mk_dict['word_type'] = Selector(text=r.content).xpath('//div[re:test(@class,"grammar")]//text()').extract()[1].encode('utf-8')
         except:
             mk_dict['word_type'] = 'Нема резултати'
-        try:
-            word_definition = Selector(text=r.content).xpath('//div[re:test(@class,"meaning")]//text()').extract()
+        word_definition = Selector(text=r.content).xpath('//div[re:test(@class,"meaning")]//text()').extract()
+        if word_definition:
             mk_dict['word_definition'] = word_definition
-        except:
+        else:
             mk_dict['word_definition'] = 'Нема резултати'
         return mk_dict
-        
+
+    def get_wiki_data(self, phrase):
+        wiki = WikiApi({'locale':'mk'})
+        results = wiki.find(phrase)
+        if results:
+            wiki_response = wiki.get_article(results[0]).summary
+        else:
+            wiki_response = 'Нема резултати'
+        return wiki_response
+
     def get(self, request):
         return render_to_response('main.html')
     
@@ -60,15 +69,8 @@ class MainView(View):
         sentence = decoder.run(audio.audio_file.url)
         decoded_sentence = (' ').join(sentence)
         data['decoded_phrase'] = re.sub('<[^<]+?>', '', decoded_sentence).strip(' \n\t\r')
-        #data['decoded_phrase'] = decoded_sentence
         # Wikipedia search
-        wiki = WikiApi({'locale':'mk'})
-        results = wiki.find(data['decoded_phrase'])
-        if results:
-            response = wiki.get_article(results[0]).summary
-            data['wiki_response'] = response
-        else:
-            data['wiki_response'] = 'Нема резултати'
+        data['wiki_response'] = self.get_wiki_data(decoded_sentence)
         # MDR search
         mk_dict = self.get_mk_dict(data['decoded_phrase'])
         data['mk_dict_type'] = mk_dict['word_type']
