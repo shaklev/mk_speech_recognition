@@ -6,36 +6,65 @@ from django.views import View
 from django.shortcuts import render_to_response
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from wikiapi import WikiApi
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 from core.speech_decoder import SpeechDetector
+from audio.models import Audio
+
+from wikiapi import WikiApi
 import os
+import wave
+import pyaudio
+import time
+import re
+import urllib2
+import requests
+from scrapy.selector import Selector
 
 @method_decorator(csrf_exempt, name='dispatch')
 class MainView(View):
 
+    def hasNumbers(self, inputString):
+        return any(char.isdigit() for char in inputString)
+
+    def get_mk_dict(self, phrase):
+        mk_dict = {}
+        meaning = []
+        session = requests.Session()
+        session.headers.update({'User-Agent': 'Custom user agent'})
+        url = 'http://www.makedonski.info/search/'
+        data = dict(q=phrase,)
+        r = session.post(url, data=data, allow_redirects=True)
+        mk_dict['word_type'] = Selector(text=r.content).xpath('//div[re:test(@class,"grammar")]//text()').extract()[1].encode('utf-8')
+        word_definition = Selector(text=r.content).xpath('//div[re:test(@class,"meaning")]//text()').extract()
+        mk_dict['word_definition'] = word_definition
+        return mk_dict
+        
     def get(self, request):
         return render_to_response('main.html')
     
     def post(self, request):
-        audio_blob = request.FILES['audio']
+        data = {}
+        audio = request.FILES['audio']
+        audio = Audio(audio_file=audio)
+        audio.save()
+        # Decode audio
         decoder = SpeechDetector()
-        sentence = decoder.run(audio_blob)
+        sentence = decoder.run(audio.audio_file.url)
         decoded_sentence = (' ').join(sentence)
-        
-        print 'The input sentence is:'
-        print decoded_sentence
-        # WIKIPEDIA SEARCH
-        # wiki = WikiApi({'locale':'mk'})
-        # decoded_sentence = 'decoded_sentence'
-        # print 'Searching for results'
-        # results = wiki.find(decoded_sentence)
-        # print 'Done searching'
-        # if results:
-        #     response = wiki.get_article(results[0]).summary
-        #     print 'The search returned the following article:'
-        #     print response
-        # else:
-        #     print 'No results were found for the sentence %s' %decoded_sentence
-        data = {'status':200}
+        # data['decoded_phrase'] = re.sub('<[^<]+?>', '', decoded_sentence).strip(' \n\t\r')
+        data['decoded_phrase'] = 'јазик'
+        # Wikipedia search
+        wiki = WikiApi({'locale':'mk'})
+        results = wiki.find(data['decoded_phrase'])
+        if results:
+            response = wiki.get_article(results[0]).summary
+            data['wiki_response'] = response
+        else:
+            data['wiki_response'] = 'Нема резултати'
+        # MDR search
+        mk_dict = self.get_mk_dict(data['decoded_phrase'])
+        data['mk_dict_type'] = mk_dict['word_type']
+        data['mk_dict_definition'] = mk_dict['word_definition']
         return JsonResponse(data)

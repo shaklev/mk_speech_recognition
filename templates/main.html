@@ -9,9 +9,8 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <!-- Record RTC -->
         <script src="https://github.com/muaz-khan/RecordRTC/releases/download/5.4.5/RecordRTC.js"></script>
-        
         <link rel="stylesheet" href="{% static 'css/circle.css' %}">
-        
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
     </head>
     <body>
         <center>
@@ -19,7 +18,7 @@
                 <div class="row">
                     <h2> Кажете ја вашата фраза: </h2>
                     <img onclick="recordAudio()" src="{% static 'mic.png' %}" width=200 height=200>
-                    <button id="stopRecording">STOP</button>
+                    <button id="stopRecording" class='btn-danger'>STOP</button>
                     <div id="load">   
                         <div>А</div>                            
                         <div>М</div>
@@ -30,12 +29,51 @@
                 </div>
         </div>
         </center>
+        <hr>
+        <div class="main_content" hidden>
+            <div class="col-md-6">
+                <h3> Изговор: </h3>
+                <audio controls></audio>
+            </div>
+            <div class="col-md-6">
+                <h3> Фраза: </h3>
+                <p id="decoded_phrase"></p>
+                <hr>
+                <h3> Анализа: </h3>
+                <p id="mk_dic_res">
+                    <i><u>Тип:</u> <span id="word_type"></span></i>
+                    </br>
+                    <i><u>Значење:</u> <span id="word_definition"></span></i>
+                </p>
+                <hr>
+                <h3> Википедија: </h3>
+                <p id="wikipedia_res"></p>
+            </div>
+        </div>
+
+        <div class='global-spinner-container' hidden>
+            <div class='spinner'>
+                <div class='bar1'></div>
+                <div class='bar2'></div>
+                <div class='bar3'></div>
+                <div class='bar4'></div>
+                <div class='bar5'></div>
+                <div class='bar6'></div>
+                <div class='bar7'></div>
+                <div class='bar8'></div>
+                <div class='bar9'></div>
+                <div class='bar10'></div>
+                <div class='bar11'></div>
+                <div class='bar12'></div>
+            </div>
+            <div class='spinner-message'>Loading...</div>
+        </div>
     </body>
 
     <script>
 
     var recordRTC;
-
+    var audio = document.querySelector('audio');
     var mediaConstraints = { video: false, audio: true };
 
     // Initialize & start recording
@@ -48,8 +86,9 @@
     var options = {
         type: 'audio',
         recorderType: StereoAudioRecorder,
-        sampleRate: 16000,
         desiredSampRate: 16000,
+        numberOfAudioChannels: 1,
+        mimeType: 'audio/wav',
     };
     recordRTC = RecordRTC(audioStream, options);
     recordRTC.startRecording();
@@ -61,9 +100,12 @@
     }
 
     $('#stopRecording').click(function () {
-        recordRTC.stopRecording(function(audioURL) {    
+        $(".main_content").hide();
+        $(".global-spinner-container").show();
+        recordRTC.stopRecording(function(audioURL) {
             var recordedBlob = recordRTC.getBlob();
-            console.log(recordedBlob);
+            audio.src = URL.createObjectURL(recordedBlob);
+            audio.play();
             sendBlob(recordedBlob);
             recordRTC.getDataURL(function(dataURL) { });
         });
@@ -80,8 +122,17 @@
             processData: false,
             contentType: false
         }).done(function(data) {
+            $(".global-spinner-container").hide();
+            
+            $("#decoded_phrase").text(data['decoded_phrase']);
+            $("#word_type").text(data['mk_dict_type']);
+            $("#word_definition").text(data['mk_dict_definition']);
+            $("#wikipedia_res").text(data['wiki_response'])
+            
+            $(".global-spinner-container").hide();
+            $(".main_content").show();
             console.log(data);
-        });
+        }); 
     }
 
     </script>
